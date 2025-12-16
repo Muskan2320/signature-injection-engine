@@ -1,0 +1,9 @@
+# dependencies
+node_modules/
+
+# env
+.env
+
+# generated files
+backend/signed/
+backend/pdfs/*.pdf
