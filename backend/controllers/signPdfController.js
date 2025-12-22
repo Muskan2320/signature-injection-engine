@@ -9,19 +9,12 @@ async function signPdfController(req, res) {
   try {
     const { pdfId, fields } = req.body;
 
-    const signatureField = fields.find(f => f.type === "signature");
-
-    const coordinates = {
-      page: signatureField.page,
-      xRatio: signatureField.xRatio,
-      yRatio: signatureField.yRatio,
-      widthRatio: signatureField.widthRatio,
-      heightRatio: signatureField.heightRatio
-    };
+    if (!pdfId || !Array.isArray(fields) || fields.length === 0) {
+      return res.status(400).json({ error: "Invalid payload" });
+    }
 
     const pdfPath = path.join("pdfs", `${pdfId}.pdf`);
     const originalPdfBuffer = fs.readFileSync(pdfPath);
-
     const originalHash = generateHash(originalPdfBuffer);
 
     const signatureImage = fs.readFileSync(
@@ -31,16 +24,14 @@ async function signPdfController(req, res) {
     const signedPdfBytes = await signPdf({
       pdfPath,
       signatureImage,
-      coordinates
+      fields
     });
 
     const signedHash = generateHash(signedPdfBytes);
 
     fs.mkdirSync("signed", { recursive: true });
-    fs.writeFileSync(
-      path.join("signed", `${pdfId}-signed.pdf`),
-      signedPdfBytes
-    );
+    const outputPath = path.join("signed", `${pdfId}-signed.pdf`);
+    fs.writeFileSync(outputPath, signedPdfBytes);
 
     await Audit.create({
       pdfId,
