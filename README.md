@@ -1,6 +1,6 @@
 # Signature Injection Engine
 
-This project is a prototype built for the BoloForms Full Stack Developer (MERN) assignment.
+This project is a prototype built for the Full Stack Developer (MERN) assignment.
 
 ## Overview
 The Signature Injection Engine allows users to place signature and form fields on a PDF in a responsive web editor and permanently burn those signatures into the PDF on the backend with audit-level integrity.
@@ -38,30 +38,6 @@ widthRatio = width / pdfWidth
 heightRatio = height / pdfHeight  
 
 Backend converts ratios to PDF points and flips Y-axis.
-
----
-
-## Project Structure
-
-signature-injection-engine/
-│
-├── backend/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   ├── utils/
-│   ├── pdfs/
-│   ├── signed/
-│   ├── server.js
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── utils/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│
-└── README.md
 
 ---
 
