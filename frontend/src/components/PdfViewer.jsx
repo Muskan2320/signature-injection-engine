@@ -17,7 +17,6 @@ export default function PdfViewer({ pdfUrl, fields, setFields }) {
     });
 
     observer.observe(containerRef.current);
-
     return () => observer.disconnect();
   }, []);
 
@@ -63,16 +62,19 @@ export default function PdfViewer({ pdfUrl, fields, setFields }) {
       style={{
         position: "relative",
         width: "100%",
-        height: "100%",
-        overflow: "auto",
-        border: "1px solid #ccc"
+        height: "100vh",
+        minHeight: "600px",
+        border: "1px solid #ccc",
+        background: "#fff",
+        overflow: "hidden"
       }}
     >
       <div
         style={{
           position: "absolute",
           inset: 0,
-          zIndex: 0
+          zIndex: 0,
+          background: "#fff"
         }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => e.preventDefault()}
@@ -83,8 +85,7 @@ export default function PdfViewer({ pdfUrl, fields, setFields }) {
           style={{
             width: "100%",
             height: "100%",
-            border: "none",
-            pointerEvents: "none"
+            border: "none"
           }}
         />
       </div>
