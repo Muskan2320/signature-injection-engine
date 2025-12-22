@@ -1,10 +1,9 @@
-// src/components/DraggableField.jsx
 import { ratioToPx } from "../utils/coordinate";
 
 export default function DraggableField({ field, pdfWidth, pdfHeight }) {
   const { x, y, width, height } = ratioToPx(
     field,
-  pdfWidth,
+    pdfWidth,
     pdfHeight
   );
 
@@ -14,9 +13,8 @@ export default function DraggableField({ field, pdfWidth, pdfHeight }) {
         position: "absolute",
         left: x,
         top: y,
-        width: width,
-        height: height,
-        boxSizing: "border-box",
+        width,
+        height,
         border: "2px dashed #007bff",
         background: "rgba(0,123,255,0.1)",
         display: "flex",
@@ -26,7 +24,7 @@ export default function DraggableField({ field, pdfWidth, pdfHeight }) {
         pointerEvents: "none"
       }}
     >
-      {field.type}
+      {field.type === "date" ? field.value : field.type}
     </div>
   );
 }

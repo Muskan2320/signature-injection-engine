@@ -1,18 +1,36 @@
-// src/components/PdfViewer.jsx
-import { useRef, useState, useEffect } from "react";
-import { Document, Page } from "react-pdf";
+import { useRef, useEffect, useState } from "react";
 import DraggableField from "./DraggableField";
 import { pxToRatio } from "../utils/coordinate";
 
-export default function PdfViewer({ pdfUrl }) {
+export default function PdfViewer({ pdfUrl, fields, setFields }) {
   const containerRef = useRef(null);
-  const [fields, setFields] = useState([]);
-  const [pdfSize, setPdfSize] = useState({ width: 0, height: 0 });
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer = new ResizeObserver(() => {
+      if (!containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      setSize({ width: rect.width, height: rect.height });
+    });
+
+    observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   const onDrop = (e) => {
     e.preventDefault();
 
-    const type = e.dataTransfer.getData("fieldType");
+    let type = e.dataTransfer.getData("fieldType");
+    if (!type) return;
+
+    type = type.toLowerCase();
+
+    if (!containerRef.current) return;
+
     const rect = containerRef.current.getBoundingClientRect();
 
     const x = e.clientX - rect.left;
@@ -28,22 +46,14 @@ export default function PdfViewer({ pdfUrl }) {
         page: 1,
         ...ratios,
         widthRatio: 0.2,
-        heightRatio: 0.08
+        heightRatio: 0.08,
+        value:
+          type === "date"
+            ? new Date().toLocaleDateString()
+            : null
       }
     ]);
   };
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const observer = new ResizeObserver(() => {
-      const rect = containerRef.current.getBoundingClientRect();
-      setPdfSize({ width: rect.width, height: rect.height });
-    });
-
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div
@@ -53,21 +63,42 @@ export default function PdfViewer({ pdfUrl }) {
       style={{
         position: "relative",
         width: "100%",
+        height: "100%",
+        overflow: "auto",
         border: "1px solid #ccc"
       }}
     >
-      <Document file={pdfUrl}>
-        <Page pageNumber={1} width={pdfSize.width} />
-      </Document>
-
-      {fields.map((f) => (
-        <DraggableField
-          key={f.id}
-          field={f}
-          pdfWidth={pdfSize.width}
-          pdfHeight={pdfSize.height}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0
+        }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => e.preventDefault()}
+      >
+        <iframe
+          src={pdfUrl}
+          title="pdf"
+          style={{
+            width: "100%",
+            height: "100%",
+            border: "none",
+            pointerEvents: "none"
+          }}
         />
-      ))}
+      </div>
+
+      <div style={{ position: "relative", zIndex: 1 }}>
+        {fields.map((field) => (
+          <DraggableField
+            key={field.id}
+            field={field}
+            pdfWidth={size.width}
+            pdfHeight={size.height}
+          />
+        ))}
+      </div>
     </div>
   );
 }

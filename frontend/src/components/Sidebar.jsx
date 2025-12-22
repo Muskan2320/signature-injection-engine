@@ -1,35 +1,26 @@
-// src/components/Sidebar.jsx
-
-const fields = [
-  { type: "text", label: "Text" },
-  { type: "signature", label: "Signature" },
-  { type: "date", label: "Date" },
-  { type: "image", label: "Image" },
-  { type: "radio", label: "Radio" }
-];
-
 export default function Sidebar() {
-  const onDragStart = (e, type) => {
-    e.dataTransfer.setData("fieldType", type);
-  };
+  const fields = ["Signature", "Date"];
 
   return (
-    <div style={{ padding: "10px", borderRight: "1px solid #ccc" }}>
-      <h4>Fields</h4>
-      {fields.map((f) => (
+    <div>
+      <h3>Fields</h3>
+
+      {fields.map((field) => (
         <div
-          key={f.type}
+          key={field}
           draggable
-          onDragStart={(e) => onDragStart(e, f.type)}
+          onDragStart={(e) =>
+            e.dataTransfer.setData("fieldType", field.toLowerCase())
+          }
           style={{
+            border: "1px solid #ccc",
             padding: "8px",
             marginBottom: "8px",
-            border: "1px solid #999",
             cursor: "grab",
-            background: "#f9f9f9"
+            background: "#fff"
           }}
         >
-          {f.label}
+          {field}
         </div>
       ))}
     </div>
