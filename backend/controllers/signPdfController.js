@@ -19,7 +19,6 @@ async function signPdfController(req, res) {
 
     const originalHash = generateHash(originalPdfBuffer);
 
-    // ⬇️ Convert field → coordinates
     const signatureField = fields.find(f => f.type === "signature");
 
     if (!signatureField) {
