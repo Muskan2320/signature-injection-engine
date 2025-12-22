@@ -1,4 +1,3 @@
-// controllers/signPdfController.js
 const fs = require("fs");
 const path = require("path");
 
@@ -10,31 +9,38 @@ async function signPdfController(req, res) {
   try {
     const { pdfId, fields } = req.body;
 
-    if (!fields || fields.length === 0) {
-      return res.status(400).json({ error: "No fields provided" });
-    }
+    const signatureField = fields.find(f => f.type === "signature");
+
+    const coordinates = {
+      page: signatureField.page,
+      xRatio: signatureField.xRatio,
+      yRatio: signatureField.yRatio,
+      widthRatio: signatureField.widthRatio,
+      heightRatio: signatureField.heightRatio
+    };
 
     const pdfPath = path.join("pdfs", `${pdfId}.pdf`);
     const originalPdfBuffer = fs.readFileSync(pdfPath);
 
     const originalHash = generateHash(originalPdfBuffer);
 
-    const signatureField = fields.find(f => f.type === "signature");
-
-    if (!signatureField) {
-      return res.status(400).json({ error: "No signature field found" });
-    }
+    const signatureImage = fs.readFileSync(
+      path.join(__dirname, "../assets/sample-signature.png")
+    );
 
     const signedPdfBytes = await signPdf({
       pdfPath,
-      coordinates: signatureField
+      signatureImage,
+      coordinates
     });
 
     const signedHash = generateHash(signedPdfBytes);
 
-    const outputPath = path.join("signed", `${pdfId}-signed.pdf`);
     fs.mkdirSync("signed", { recursive: true });
-    fs.writeFileSync(outputPath, signedPdfBytes);
+    fs.writeFileSync(
+      path.join("signed", `${pdfId}-signed.pdf`),
+      signedPdfBytes
+    );
 
     await Audit.create({
       pdfId,
@@ -47,7 +53,8 @@ async function signPdfController(req, res) {
       url: `/signed/${pdfId}-signed.pdf`
     });
   } catch (err) {
-    console.error("SIGN ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 }
+
+module.exports = { signPdfController };
