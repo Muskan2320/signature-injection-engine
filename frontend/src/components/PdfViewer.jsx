@@ -11,7 +11,6 @@ export default function PdfViewer({ pdfUrl, fields, setFields }) {
 
     const observer = new ResizeObserver(() => {
       if (!containerRef.current) return;
-
       const rect = containerRef.current.getBoundingClientRect();
       setSize({ width: rect.width, height: rect.height });
     });
@@ -28,10 +27,7 @@ export default function PdfViewer({ pdfUrl, fields, setFields }) {
 
     type = type.toLowerCase();
 
-    if (!containerRef.current) return;
-
     const rect = containerRef.current.getBoundingClientRect();
-
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
@@ -69,15 +65,14 @@ export default function PdfViewer({ pdfUrl, fields, setFields }) {
         overflow: "hidden"
       }}
     >
+      {/* PDF layer (NON-INTERACTIVE) */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           zIndex: 0,
-          background: "#fff"
+          pointerEvents: "none"   
         }}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => e.preventDefault()}
       >
         <iframe
           src={pdfUrl}
@@ -90,6 +85,7 @@ export default function PdfViewer({ pdfUrl, fields, setFields }) {
         />
       </div>
 
+      {/* Field overlay layer */}
       <div style={{ position: "relative", zIndex: 1 }}>
         {fields.map((field) => (
           <DraggableField
